@@ -1,12 +1,22 @@
 import Link from "next/link";
+import { prisma } from "../db";
+import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 async function createTodo(data: FormData) {
-  'use server'
+  "use server";
 
-  console.log("HI");
+  const title = data.get("title")?.valueOf();
+  if (typeof title !== "string" || title.length === 0) {
+    throw new Error("Invalid Title");
+  }
+
+  await prisma.todo.create({ data: { title, complete: false } })
+
+  redirect("/");
 }
 
-export default async function Page() {
+export default function Page() {
   return (
     <>
       <header className="flex justify-between items-center mb-4">

@@ -1,15 +1,23 @@
 import Link from "next/link";
 import { prisma } from "./db";
 import { get } from "http";
+import TodoItem from "@/components/TodoItem";
+import { CompletionInfoFlags } from "typescript";
+
+async function toggleTodo(id: string, complete: boolean) {
+  "use server";
+  await prisma.todo.update({
+    where: { id },
+    data: {complete}
+  })
+}
 
 function getTodos() {
-  return prisma.todo.findMany()
+  return prisma.todo.findMany();
 }
 
 export default async function Page() {
   const todos = await getTodos();
-  // await prisma.todo.create({ data: { title: "test", complete: false } });
-
   return (
     <>
       <header className="flex justify-between items-center mb-4">
@@ -25,7 +33,7 @@ export default async function Page() {
       </header>
       <ul className="pl-4">
         {todos.map((todo) => (
-          <li key={todo.id}>{todo.title}</li>
+          <TodoItem {...todo} key={todo.id} toggleTodo={toggleTodo}/>
         ))}
       </ul>
     </>
